@@ -2,3 +2,10 @@ openai
 python-dotenv
 sentence-transformers
 faiss-cpu
+numpy
+gradiopython.exe -m pip install --upgrade pip #ЧТО ЗДЕСЬ МОЖНО/НУЖНО УСТАНОВИТЬ ГРАДИО
+
+#ПРОБУЙ ЗАПУСТИТЬ БОТ СПЕРВА ЧЕРЕЖЗ python main.py
+#ПОТОМ ЧЕРЕЗ ГРАДИО (блять какяэто делала) (через интерфейс)
+
+#ЗАХОДИМ В ЧАТ РЕШАЕМ ТЕМКУ С ВОРНИНГ ПРОДОЛЖАЕМ ТЕСТИРОВАТЬ

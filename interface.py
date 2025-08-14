@@ -1,44 +1,53 @@
 import gradio as gr
 from chat import chat_with_memory
 from memory import get_recent_memories
+import warnings
 
-session_storage = {}  # глбальна переменная для хранение session_id
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+session_storage = {}  # глобальная переменная для хранения session_id
 
 
 def handle_name_submit(name):
     if not name.strip():
-        return gr.update(), [], "Пожалуйста, введите имя."
+        return [], "Пожалуйста, введите имя."
 
     session_id = f"session_{name.lower().strip()}"
 
-    # Загружаем историю если лна есть
+    # Загружаем историю, если она есть
     history = get_recent_memories(session_id)
-    chat_history = []  # Создаем пустую историю #абоба
+    chat_history = []
 
     if history:
         chat_history.append(
-            (None, f"👋 С возвращением, {name.strip()}! Вот ваша история чата:")
+            {
+                "role": "assistant",
+                "content": f"👋 С возвращением, {name.strip()}! Вот ваша история чата:",
+            }
         )
 
-        # переобразуем [(role, message), ...] → [ (user, assistant), ... ]
+        # Восстанавливаем формат сообщений для Chatbot
         temp_user_msg = None
         for item in history:
             if item["role"] == "user":
                 temp_user_msg = item["message"]
             elif item["role"] == "assistant" and temp_user_msg:
-                chat_history.append((temp_user_msg, item["message"]))
+                chat_history.append({"role": "user", "content": temp_user_msg})
+                chat_history.append({"role": "assistant", "content": item["message"]})
                 temp_user_msg = None
 
-        notification = f"Сущевствующая сессия '{name.strip()}' восстановлена."
+        notification = f"Существующая сессия '{name.strip()}' восстановлена."
 
     else:
         greeting = f"👋 Привет, {name.strip()}!"
         help_text = chat_with_memory("/help", session_id)
-        chat_history = [(None, greeting), (None, help_text)]
-        notification = f" Новая сессия '{name.strip()}' создана."
+        chat_history = [
+            {"role": "assistant", "content": greeting},
+            {"role": "assistant", "content": help_text},
+        ]
+        notification = f"Новая сессия '{name.strip()}' создана."
 
-    # АПвтоматическоре приветсвтие и список комнад
-    return gr.update(visible=True), chat_history, notification
+    return chat_history, notification
 
 
 def handle_chat(name: str, message: str, chat_history: list):
@@ -52,7 +61,8 @@ def handle_chat(name: str, message: str, chat_history: list):
 
     response = chat_with_memory(message, session_id)
 
-    chat_history.append((message, response))
+    chat_history.append({"role": "user", "content": message})
+    chat_history.append({"role": "assistant", "content": response})
 
     return "", chat_history
 
@@ -64,15 +74,16 @@ with gr.Blocks(title="Light Chatbot AI") as demo:
     name_input = gr.Textbox(
         label="Имя пользователя", placeholder="Введите имя", value=""
     )
-    status_output = gr.Markdown("")  # Новое поле для уведомлений
-    chatbot = gr.Chatbot(label="Диалог")
+    status_output = gr.Markdown("")
+    chatbot = gr.Chatbot(label="Диалог", type="messages")  # Новый формат
     msg_input = gr.Textbox(label="Сообщение", placeholder="Напиши что-нибудь...")
 
-    # Добавили обработку ввода имени (Enter по имени)
+    # Обработка ввода имени
     name_input.submit(
-        handle_name_submit, inputs=name_input, outputs=[chatbot, chatbot, status_output]
+        handle_name_submit, inputs=name_input, outputs=[chatbot, status_output]
     )
 
+    # Обработка чата
     msg_input.submit(
         handle_chat,
         inputs=[name_input, msg_input, chatbot],
@@ -83,15 +94,16 @@ if __name__ == "__main__":
     demo.launch(share=True)
 
 
-# Продолжаем, заяц, сразу заходи в чат и начинай с создания README файла
+# Градио работает, все четенько
+# ПРОДОЛЖАЕМ ЧИСТИТЬ ВСЮ ДИЧЬ(с чатом)
+# Реадми, рекуриментс, и все комментари(эти тоже) удаляит
+# убедись с чатом, что они удаляютьсмя в репозтории
+# также, понми что твои токены снимаются, так что спроси че делать с твоим ключом. Замаскировать? Убрать? Измениться  ли он в гитхабе?
 
-# Смотрим в ютубе как создать репозиторий конкретно в гитхабе,
-# и что делать c README кошка.
-# (Спрашивай у чата как крепить реадми в гитхабе)
+
+# Проверяй с чатом за свой опенаи ключ в
+# репозитории, и продолжай двигаться по очистке.
+# (Что по сессиям?)
 
 
-# чекни папку lightchatbotAi слева, и спроси чат,
-# норм ли это то что в папке папка.
-# Затем, двигайся дальше, к видео
-
-# Сразу зохадим в чат, и на крайне сообщение
+# Заходи в чат и смотри как тебе отделить проект для личного исп.

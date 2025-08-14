@@ -1,5 +1,9 @@
 from chat import chat_with_memory
 from memory import load_memory_from_file
+import warnings
+
+
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def main():
